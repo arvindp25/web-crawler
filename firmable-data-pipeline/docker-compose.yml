@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: firmable
+      POSTGRES_USER: firmable_user
+      POSTGRES_PASSWORD: firmable_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U firmable_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@firmable.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    # volumes:
+    #   - ./pgadmin:/var/lib/pgadmin
+    #   - ./pgadmin-servers.json:/pgadmin4/servers.json
+    depends_on:
+      - postgres
+
+  etl:
+    build: .
+    volumes:
+      - ./data:/app/data
+    environment:
+      DATABASE_URL: postgresql+psycopg2://firmable_user:firmable_pass@postgres:5432/firmable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    command: >
+          python run.py --abr --abr-limit 1 --crawl --crawl-pages 1
+
+volumes:
+  pgdata:
