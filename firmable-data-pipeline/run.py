@@ -53,12 +53,14 @@ def run_common_crawl_pipeline(crawl_pages=100):
         digest = rec.get("digest")
         offset = rec.get("offset")
         length = rec.get("length")
+        url = rec.get("url")
         if warc_path and digest and offset and length:
             warc_index[warc_path].append({
                 "digest": digest,
                 "offset": int(offset),
                 "length": int(length),
-                "warc_path": warc_path
+                "warc_path": warc_path,
+                "url": url
             })
 
     print(f"🔁 Found {len(warc_index)} WARC files with matching digests")
@@ -66,7 +68,7 @@ def run_common_crawl_pipeline(crawl_pages=100):
     total_loaded = 0
 
     # Limit to 10 WARC files for testing
-    for warc_path, entries in list(warc_index.items())[:10]:
+    for warc_path, entries in list(warc_index.items()):
         try:
             # Pass full entry metadata to the extractor
             extracted = download_and_extract_company_data(

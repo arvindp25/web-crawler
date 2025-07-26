@@ -7,14 +7,16 @@ from warcio.archiveiterator import ArchiveIterator
 from bs4 import BeautifulSoup
 from io import BytesIO
 from sqlalchemy.exc import IntegrityError
-from db.conn import SessionLocal  # adjust import as per your structure
-from db.common_crawl_models import CrawlRecord  # adjust import as per your structure
-
+from db.conn import SessionLocal 
+from db.common_crawl_models import CrawlRecord
+from urllib.parse import urlparse
+import spacy
 
 CDX_INDEX = "https://index.commoncrawl.org/CC-MAIN-2025-13-index"
 QUERY_SIZE = 1000
 MAX_PAGES = 10
 WARC_BASE = "https://data.commoncrawl.org/"
+nlp = spacy.load("en_core_web_sm")
 
 
 def search_common_crawl(domain_keyword: str, pages: int = MAX_PAGES):
@@ -71,40 +73,100 @@ def search_common_crawl(domain_keyword: str, pages: int = MAX_PAGES):
         print(f"[i] Waiting {delay:.2f}s before next page...")
         time.sleep(delay)
 
+def normalize_company_name(title: str) -> str:
+    """Extract cleaner company name from title string."""
+    if not title:
+        return None
+    if "–" in title:
+        return title.split("–")[-1].strip()
+    if "-" in title:
+        return title.split("-")[-1].strip()
+    return title.strip()
+
+
+def extract_company_name_from_html(soup: BeautifulSoup, html_text: str = "") -> str:
+    # 1. Meta tags
+    meta_tags = [
+        ('meta', {'property': 'og:site_name'}),
+        ('meta', {'name': 'og:site_name'}),
+        ('meta', {'name': 'description'}),
+        ('meta', {'property': 'og:title'})
+    ]
+    for tag in meta_tags:
+        meta = soup.find(*tag)
+        if meta and meta.get('content'):
+            return normalize_company_name(meta['content'])
+
+    # 2. Title tag
+    if soup.title and soup.title.string:
+        return normalize_company_name(soup.title.string)
+
+    # 3. H1 fallback
+    h1 = soup.find("h1")
+    if h1:
+        return normalize_company_name(h1.text)
+
+    # 4. Footer pattern (e.g., © 2024 XYZ Pty Ltd)
+    footer_text = soup.get_text()
+    match = re.search(r'© ?\d{4} ?(.+?)(\.|All rights reserved|$)', footer_text, re.IGNORECASE)
+    if match:
+        return normalize_company_name(match.group(1))
+
+    # 5. Named Entity Recognition (ORG)
+    if html_text:
+        doc = nlp(html_text)
+        for ent in doc.ents:
+            if ent.label_ == "ORG":
+                return normalize_company_name(ent.text)
+
+    return None
+
+
+seen_domains = set()
 def download_and_extract_company_data(
     entries: list[dict],
     digest_set: set
 ) -> list[dict]:
     """
-    Given a list of WARC metadata entries (with offset, length, filename), 
-    this function fetches only the necessary byte ranges, extracts HTML content, 
-    and parses company name and naive industry metadata.
+    Downloads WARC byte ranges for selected entries, parses HTML for company name,
+    and deduplicates based on digest + domain.
+    Only processes the first occurrence per domain.
     """
-    import requests
-    from warcio.archiveiterator import ArchiveIterator
-    from bs4 import BeautifulSoup
-
     matched_records = []
 
     for entry in entries:
         if entry.get("digest") not in digest_set:
             continue
 
+        target_url = entry.get("url")
+        if not target_url:
+            continue
+        parsed = urlparse(target_url)
+        domain = parsed.netloc.lower()
+
+        # Strict: only allow one page per domain — first occurrence
+        if domain in seen_domains:
+            print(f"[i] Skipping domain already seen: {domain}")
+            continue
+
+        # Mark domain early
+        seen_domains.add(domain)
+
         warc_path = entry["warc_path"]
         offset = int(entry["offset"])
         length = int(entry["length"])
         start = offset
         end = offset + length - 1
-        url = f"{WARC_BASE}{warc_path}"
+        warc_url = f"{WARC_BASE}{warc_path}"
 
         headers = {"Range": f"bytes={start}-{end}"}
-        print(f"📦 Downloading WARC fragment: {url} [{start}-{end}]")
+        print(f"📦 Downloading WARC fragment: {warc_url} [{start}-{end}]")
 
         try:
-            response = requests.get(url, headers=headers, stream=True, timeout=30)
+            response = requests.get(warc_url, headers=headers, stream=True, timeout=30)
             response.raise_for_status()
         except Exception as e:
-            print(f"[!] Failed to fetch range: {e}")
+            print(f"[!] Failed to fetch WARC range: {e}")
             continue
 
         try:
@@ -114,22 +176,19 @@ def download_and_extract_company_data(
 
                 payload = record.content_stream().read()
                 soup = BeautifulSoup(payload, "html.parser")
+                text_content = soup.get_text()
 
-                title = soup.title.string.strip() if soup.title and soup.title.string else None
+                # 🔍 Improved extraction
+                clean_name = extract_company_name_from_html(soup, text_content)
 
-                # Naive industry detection from meta
-                meta_industry = None
-                for meta in soup.find_all("meta"):
-                    if meta.get("name", "").lower() in {"keywords", "description"}:
-                        meta_industry = meta.get("content", "").strip().lower()
-                        break
 
                 matched_records.append({
-                    "url": record.rec_headers.get("WARC-Target-URI"),
-                    "company_name": title,
-                    "industry": meta_industry,
+                    "url": target_url,
+                    "company_name": clean_name,
                     "digest": entry.get("digest")
                 })
+
+                break  # Only process one record
 
         except Exception as parse_err:
             print(f"[!] Error parsing WARC response: {parse_err}")

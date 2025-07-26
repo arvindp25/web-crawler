@@ -13,5 +13,6 @@ COPY . .
 
 # Create volume mount point
 VOLUME ["/app/abr_xml_data"]
+RUN python -m spacy download en_core_web_sm
 
 CMD ["python", "run.py"]
