@@ -34,8 +34,7 @@ def load_crawl_records(records):
                 set_={
                     "title": stmt.excluded.title,
                     "text": stmt.excluded.text,
-                    "timestamp": stmt.excluded.timestamp,
-                    "industry": stmt.excluded.industry,
+                    "timestamp": stmt.excluded.timestamp
                 },
                 where=stmt.excluded.timestamp > CrawlRecord.timestamp  # only update if timestamp is newer
             )

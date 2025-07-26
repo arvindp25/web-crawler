@@ -8,7 +8,6 @@ class CrawlRecord(Base):
     title = Column(String)
     text = Column(Text)
     timestamp = Column(String)
-    industry = Column(String)
-    company_name = Column(String)  # ✅ Add this
-    digest = Column(String, unique=True)  # ✅ Add this
+    company_name = Column(String)
+    digest = Column(String)
     __table_args__ = (UniqueConstraint("url", name="_url_uc"),)

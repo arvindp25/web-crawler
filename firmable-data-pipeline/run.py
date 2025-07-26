@@ -76,7 +76,6 @@ def run_common_crawl_pipeline(crawl_pages=100):
                 digest_set={e["digest"] for e in entries})
             if extracted:
                 print(f"✅ Extracted {len(extracted)} records from {warc_path}")
-                print(extracted)
                 load_crawl_records(extracted)
                 total_loaded += len(extracted)
         except Exception as e:

@@ -11,6 +11,7 @@ from db.conn import SessionLocal
 from db.common_crawl_models import CrawlRecord
 from urllib.parse import urlparse
 import spacy
+import re
 
 CDX_INDEX = "https://index.commoncrawl.org/CC-MAIN-2025-13-index"
 QUERY_SIZE = 1000
@@ -48,7 +49,6 @@ def search_common_crawl(domain_keyword: str, pages: int = MAX_PAGES):
                             "digest": record.get("digest"),
                             "mime": record.get("mime"),
                             "status": record.get("status"),
-                            "industry": record.get("industry"),
                             "filename": record.get("filename"),
                             "offset": record.get("offset"),
                             "length": record.get("length")
@@ -70,6 +70,7 @@ def search_common_crawl(domain_keyword: str, pages: int = MAX_PAGES):
 
         # Always wait a random interval before next page
         delay = random.uniform(0.5, 2.0)
+        print(f"[i] Extracted Page {page}...")
         print(f"[i] Waiting {delay:.2f}s before next page...")
         time.sleep(delay)
 
