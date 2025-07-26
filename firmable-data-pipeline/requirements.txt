@@ -1,3 +1,4 @@
+beautifulsoup4==4.13.4
 certifi==2025.7.14
 charset-normalizer==3.4.2
 greenlet==3.2.3
@@ -8,7 +9,10 @@ pluggy==1.6.0
 Pygments==2.19.2
 pytest==8.4.1
 requests==2.32.4
+six==1.17.0
+soupsieve==2.7
 SQLAlchemy==2.0.41
 typing_extensions==4.14.1
 urllib3==2.5.0
+warcio==1.7.5
 psycopg2-binary==2.9.9

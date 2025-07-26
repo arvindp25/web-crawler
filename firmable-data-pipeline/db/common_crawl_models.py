@@ -1,12 +1,12 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Text, UniqueConstraint
 from db.base import Base
 
 class CrawlRecord(Base):
-    __tablename__ = "crawl_records"
+    __tablename__ = "crawl_records_extracted"
 
-    digest = Column(String, primary_key=True)
-    url = Column(String)
+    url = Column(String, primary_key=True)
+    title = Column(String)
+    text = Column(Text)
     timestamp = Column(String)
-    mime = Column(String)
-    status = Column(String)
-    industry = Column(String, nullable=True)
+    industry = Column(String)
+    __table_args__ = (UniqueConstraint("url", name="_url_uc"),)

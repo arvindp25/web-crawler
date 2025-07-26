@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, Date, Integer
 from db.base import Base
 
 class ABRRecord(Base):
-    __tablename__ = "abr_records"
+    __tablename__ = "abr_records_extracted"
 
     abn = Column(String, primary_key=True)
     entity_name = Column(String)

@@ -42,7 +42,6 @@ services:
     stdin_open: true
     tty: true
     command: >
-          python run.py --abr --abr-limit 1 --crawl --crawl-pages 1
-
+          python run.py --abr --abr-limit 2 --abr-records 20000 --crawl --crawl-pages 1
 volumes:
   pgdata:
