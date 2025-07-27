@@ -1,9 +1,7 @@
 ../../.venv/
+data/
+
 local.db
 .venv/
 __pycache__/
 *.py[cod]
-data1/
-
-data/*
-!data/.gitkeep

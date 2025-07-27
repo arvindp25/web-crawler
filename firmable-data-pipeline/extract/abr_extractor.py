@@ -101,11 +101,3 @@ def extract_abr_records(xml_paths: List[Path], max_files: int = None) -> Generat
         if max_files is not None and i >= max_files:
             break
         yield from parse_abr_xml(xml_path)
-
-
-# Optional: for quick debugging
-if __name__ == "__main__":
-    for i, record in enumerate(extract_abr_records(max_files=1)):
-        print(record)
-        if i >= 5:
-            break
