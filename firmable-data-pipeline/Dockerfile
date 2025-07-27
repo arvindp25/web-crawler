@@ -13,6 +13,6 @@ COPY . .
 
 # Create volume mount point
 VOLUME ["/app/abr_xml_data"]
-RUN python -m spacy download en_core_web_sm
-
+# RUN python -m spacy download en_core_web_sm
+ENV DBT_PROFILES_DIR=/app/dbt
 CMD ["python", "run.py"]

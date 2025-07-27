@@ -70,3 +70,6 @@ This project is a technical assessment for the role of **Data Engineer** at Firm
 ```bash
 git clone https://github.com/YOUR_USERNAME/firmable-data-pipeline.git
 cd firmable-data-pipeline
+
+
+export DATABASE_URL=postgresql+psycopg2://admin:admin@localhost:5432/firmable

@@ -7,7 +7,9 @@ from extract.abr_extractor import extract_abr_records, download_and_extract_abr_
 from extract.common_crawl_extractor import search_common_crawl, download_and_extract_company_data
 from load.loader import load_abr_records, load_crawl_records
 from collections import defaultdict
-
+from matcher.em import perform_string_matching
+import os
+import subprocess
 BATCH_SIZE = 500
 
 
@@ -38,7 +40,7 @@ def run_abr_pipeline(abr_limit=3, record_limit=None):
         print("⚠️ No ABR records were loaded. Check XML contents or parsing logic.")
 
 
-from collections import defaultdict
+
 
 def run_common_crawl_pipeline(crawl_pages=100):
     print("\n🌍 Fetching Common Crawl index metadata...")
@@ -49,10 +51,12 @@ def run_common_crawl_pipeline(crawl_pages=100):
     # Group digests and metadata by WARC file
     warc_index = defaultdict(list)
     for rec in records:
+        print(rec)
         warc_path = rec.get("filename")
         digest = rec.get("digest")
         offset = rec.get("offset")
         length = rec.get("length")
+        timestamp = rec.get("timestamp")
         url = rec.get("url")
         if warc_path and digest and offset and length:
             warc_index[warc_path].append({
@@ -60,14 +64,15 @@ def run_common_crawl_pipeline(crawl_pages=100):
                 "offset": int(offset),
                 "length": int(length),
                 "warc_path": warc_path,
-                "url": url
+                "url": url,
+                "timestamp": timestamp
             })
 
     print(f"🔁 Found {len(warc_index)} WARC files with matching digests")
 
     total_loaded = 0
 
-    # Limit to 10 WARC files for testing
+
     for warc_path, entries in list(warc_index.items()):
         try:
             # Pass full entry metadata to the extractor
@@ -101,26 +106,52 @@ def run_all_parallel(run_abr=True, run_crawl=True, abr_limit=3, abr_records=None
         t.join()
     print("\n✅ All data pipelines completed.")
 
+def run_dbt_command(command: str, dbt_path: str, dbt_target: str = None):
+    print(f"\n⚙️ Running: `dbt {command}` ...")
+    cmd = ["dbt", command]
+    if dbt_target:
+        cmd += ["--target", dbt_target]
+
+    env = os.environ.copy()
+    env["DBT_PROJECT_DIR"] = dbt_path
+    try:
+        subprocess.run(cmd, cwd=dbt_path, check=True, env=env)
+        print(f"✅ dbt {command} completed.")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ dbt {command} failed:\n{e}")
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run ABR and/or Common Crawl data pipelines")
+    parser = argparse.ArgumentParser(description="Run data pipeline and dbt workflow")
     parser.add_argument("--abr", action="store_true", help="Run ABR pipeline")
     parser.add_argument("--crawl", action="store_true", help="Run Common Crawl pipeline")
     parser.add_argument("--abr-limit", type=int, default=3, help="Limit number of ABR XML files")
     parser.add_argument("--crawl-pages", type=int, default=3, help="Number of Common Crawl pages to fetch")
     parser.add_argument("--abr-records", type=int, help="Limit number of ABR records to load")
+    parser.add_argument("--entity-matching", action="store_true", help="Perform entity matching after loading data")
 
+    parser.add_argument("--run-dbt", action="store_true", help="Run dbt models")
+    parser.add_argument("--test-dbt", action="store_true", help="Run dbt tests")
+    parser.add_argument("--dbt-path", default="dbt", help="Path to dbt project directory")
+    parser.add_argument("--dbt-target", default=None, help="dbt target profile (optional)")
 
     args = parser.parse_args()
-
-    if not args.abr and not args.crawl:
-        print("ℹ️ No pipeline specified. Running both by default.")
-        args.abr = args.crawl = True
 
     run_all_parallel(
         run_abr=args.abr,
         run_crawl=args.crawl,
         abr_limit=args.abr_limit,
         crawl_pages=args.crawl_pages,
-        abr_records = args.abr_records
+        abr_records=args.abr_records
     )
+
+    if args.entity_matching:
+        print("\n🔍 Starting entity matching using vector similarity...")
+        perform_string_matching()
+
+    if args.run_dbt:
+        run_dbt_command("run", args.dbt_path, args.dbt_target)
+
+    if args.test_dbt:
+        run_dbt_command("test", args.dbt_path, args.dbt_target)
+

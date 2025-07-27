@@ -1,0 +1,31 @@
+[0m14:10:28.313552 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe46171c230>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe460a530b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe460f4c9e0>]}
+
+
+============================== 14:10:28.324010 | f4aea024-db6d-458f-92a1-55ff56f2309d ==============================
+[0m14:10:28.324010 [info ] [MainThread]: Running with dbt=1.10.5
+[0m14:10:28.324664 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': '/home/arvind/.dbt', 'debug': 'False', 'version_check': 'True', 'log_path': 'logs', 'warn_error': 'None', 'fail_fast': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'introspect': 'True', 'static_parser': 'True', 'invocation_command': 'dbt init', 'target_path': 'None', 'log_format': 'default', 'send_anonymous_usage_stats': 'True'}
+[0m14:10:28.335145 [info ] [MainThread]: Creating dbt configuration folder at /home/arvind/.dbt
+[0m14:11:55.493163 [debug] [MainThread]: Starter project path: /home/arvind/firmable/.venv/lib/python3.12/site-packages/dbt/include/starter_project
+[0m14:11:55.507794 [info ] [MainThread]: 
+Your new dbt project "prrprocess" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m14:11:55.508233 [info ] [MainThread]: Setting up your profile.
+[0m14:12:37.537991 [info ] [MainThread]: Profile prrprocess written to /home/arvind/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m14:12:37.541259 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 123.36806, "process_in_blocks": "144", "process_kernel_time": 0.150601, "process_mem_max_rss": "103776", "process_out_blocks": "88", "process_user_time": 1.174692}
+[0m14:12:37.541809 [debug] [MainThread]: Command `dbt init` succeeded at 14:12:37.541704 after 123.37 seconds
+[0m14:12:37.542240 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe461046600>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe460b5da60>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fe460b5c680>]}
+[0m14:12:37.542673 [debug] [MainThread]: Flushing usage events
+[0m14:12:40.228678 [debug] [MainThread]: An error was encountered while trying to flush usage events

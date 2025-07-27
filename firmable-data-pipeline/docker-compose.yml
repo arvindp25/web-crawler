@@ -5,14 +5,15 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: firmable
-      POSTGRES_USER: firmable_user
-      POSTGRES_PASSWORD: firmable_pass
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U firmable_user"]
+      test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -34,8 +35,17 @@ services:
     build: .
     volumes:
       - ./data:/app/data
+      - ./dbt:/app/dbt
     environment:
-      DATABASE_URL: postgresql+psycopg2://firmable_user:firmable_pass@postgres:5432/firmable
+      DATABASE_URL: postgresql+psycopg2://admin:admin@postgres:5432/firmable
+      DBT_PROFILES_DIR: /app/dbt
+      DBT_PROJECT_DIR: /app/dbt/prrprocess
+      DBT_HOST: postgres
+      DBT_USER: admin
+      DBT_PASSWORD: admin
+      DBT_PORT: 5432
+      DBT_DB: firmable
+      DBT_SCHEMA: public
     depends_on:
       postgres:
         condition: service_healthy

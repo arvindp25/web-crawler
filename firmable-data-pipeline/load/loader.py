@@ -1,5 +1,5 @@
-from db.abr_models import ABRRecord
-from db.common_crawl_models import CrawlRecord
+from db.models import ABRRecord
+from db.models import CrawlRecord
 from db.conn import SessionLocal
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.dialects.postgresql import insert

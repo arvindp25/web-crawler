@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from io import BytesIO
 from sqlalchemy.exc import IntegrityError
 from db.conn import SessionLocal 
-from db.common_crawl_models import CrawlRecord
+from db.models import CrawlRecord
 from urllib.parse import urlparse
 import spacy
 import re
@@ -180,13 +180,18 @@ def download_and_extract_company_data(
                 text_content = soup.get_text()
 
                 # 🔍 Improved extraction
+                text_content = soup.get_text()
+                title_tag = soup.title.string.strip() if soup.title and soup.title.string else None
                 clean_name = extract_company_name_from_html(soup, text_content)
 
 
                 matched_records.append({
                     "url": target_url,
                     "company_name": clean_name,
-                    "digest": entry.get("digest")
+                    "title": title_tag,
+                    "text": text_content,
+                    "digest": entry.get("digest"),
+                    "timestamp": entry.get("timestamp")
                 })
 
                 break  # Only process one record

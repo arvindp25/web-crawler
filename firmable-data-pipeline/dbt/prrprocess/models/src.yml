@@ -1,0 +1,60 @@
+version: 2
+
+sources:
+  - name: firmable_sources
+    description: "Extracted source data from ABR and Common Crawl"
+    database: "{{ env_var('DBT_DB', 'postgres') }}"
+    schema: "{{ env_var('DBT_SCHEMA', 'public') }}"
+
+    tables:
+      - name: abr_records_extracted
+        description: "Raw ABR records extracted from the Australian Business Register"
+        columns:
+          - name: abn
+            description: "Australian Business Number (Primary Key)"
+          - name: entity_name
+            description: "Legal entity name"
+          - name: entity_type
+            description: "Company type (e.g., Individual, Partnership)"
+          - name: entity_status
+            description: "Registration status (Active, Cancelled, etc.)"
+          - name: address
+            description: "Business address"
+          - name: postcode
+            description: "Postal code"
+          - name: state
+            description: "State or territory"
+          - name: start_date
+            description: "Date when the ABN was registered"
+          - name: record_updated
+            description: "Last updated timestamp (raw text)"
+
+      - name: crawl_records_extracted
+        description: "Company names and metadata scraped from Common Crawl WARC files"
+        columns:
+          - name: url
+            description: "Unique page URL (Primary Key)"
+          - name: title
+            description: "HTML title of the page"
+          - name: text
+            description: "Main body text content"
+          - name: timestamp
+            description: "Timestamp when crawl was performed"
+          - name: company_name
+            description: "Extracted company name"
+          - name: digest
+            description: "Unique hash for deduplication"
+
+      - name: matched_entities
+        description: "Similarity-matched ABR and Crawl company entities"
+        columns:
+          - name: abn
+            description: "ABN from ABR (FK)"
+          - name: url
+            description: "URL from Crawl (FK)"
+          - name: entity_name
+            description: "ABR legal name at time of match"
+          - name: company_name
+            description: "Company name from web crawl"
+          - name: similarity_score
+            description: "Cosine similarity score between normalized names"

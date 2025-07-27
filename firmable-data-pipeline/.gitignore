@@ -1,4 +1,4 @@
-../.venv/
+../../.venv/
 data/
 local.db
 .venv/
