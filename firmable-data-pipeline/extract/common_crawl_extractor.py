@@ -36,7 +36,6 @@ def search_common_crawl(domain_keyword: str, pages: int = MAX_PAGES):
                     "limit": QUERY_SIZE
                 }
                 url = f"{CDX_INDEX}?{requests.compat.urlencode(params)}"
-                print(url)
                 response = requests.get(url, timeout=10)
 
                 if response.status_code == 200:

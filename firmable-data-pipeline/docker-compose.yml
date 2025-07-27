@@ -52,6 +52,6 @@ services:
     stdin_open: true
     tty: true
     command: >
-          python run.py --abr --abr-limit 2 --abr-records 1000 --crawl --crawl-pages 50
+          python run.py --abr --abr-limit 2 --abr-records 20000 --crawl --crawl-pages 70 --dbt-run --entitiy-matching
 volumes:
   pgdata:

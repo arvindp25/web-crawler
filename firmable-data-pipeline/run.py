@@ -107,15 +107,13 @@ def run_all_parallel(run_abr=True, run_crawl=True, abr_limit=3, abr_records=None
     print("\n✅ All data pipelines completed.")
 
 def run_dbt_command(command: str, dbt_path: str, dbt_target: str = None):
-    print(f"\n⚙️ Running: `dbt {command}` ...")
-    cmd = ["dbt", command]
+    print(f"\n⚙️ Running: `dbt {command}` in {dbt_path}...")
+    cmd = ["dbt", command, "--project-dir", dbt_path]
     if dbt_target:
         cmd += ["--target", dbt_target]
 
-    env = os.environ.copy()
-    env["DBT_PROJECT_DIR"] = dbt_path
     try:
-        subprocess.run(cmd, cwd=dbt_path, check=True, env=env)
+        subprocess.run(cmd, check=True)
         print(f"✅ dbt {command} completed.")
     except subprocess.CalledProcessError as e:
         print(f"❌ dbt {command} failed:\n{e}")
@@ -145,13 +143,13 @@ if __name__ == "__main__":
         abr_records=args.abr_records
     )
 
-    if args.entity_matching:
-        print("\n🔍 Starting entity matching using vector similarity...")
-        perform_string_matching()
-
     if args.run_dbt:
         run_dbt_command("run", args.dbt_path, args.dbt_target)
 
     if args.test_dbt:
         run_dbt_command("test", args.dbt_path, args.dbt_target)
 
+
+    if args.entity_matching:
+        print("\n🔍 Starting entity matching using vector similarity...")
+        perform_string_matching()

@@ -1,51 +1,68 @@
--- models/crawl_cleaned.sql
+{{ config(materialized='table') }}
+
+-- This model cleans and normalizes company names from crawl_records_extracted
+-- for downstream entity matching by:
+-- - lowercasing
+-- - removing punctuation
+-- - normalizing whitespace
+-- - stripping common legal suffixes (e.g., Pty, Ltd, etc.)
+-- The final output includes all original columns plus a normalized company name.
 
 with base as (
     select
-        id,
-        company_name,
         url,
-        industry,
-        created_at
-    from {{ ref('crawl_records') }}
+        title,
+        text,
+        timestamp,
+        company_name,
+        digest
+    from {{ source('firmable_sources', 'crawl_records_extracted') }}
 ),
 
 cleaned as (
     select
-        id,
         url,
-        industry,
-        created_at,
+        title,
+        text,
+        timestamp,
+        digest,
+        company_name,
         lower(company_name) as name_lower
     from base
 ),
 
 punctuation_removed as (
     select
-        id,
         url,
-        industry,
-        created_at,
+        title,
+        text,
+        timestamp,
+        digest,
+        company_name,
         regexp_replace(name_lower, '[^\w\s]', '', 'g') as name_no_punct
     from cleaned
 ),
 
 whitespace_normalized as (
     select
-        id,
         url,
-        industry,
-        created_at,
+        title,
+        text,
+        timestamp,
+        digest,
+        company_name,
         regexp_replace(name_no_punct, '\s+', ' ', 'g') as name_normalized
     from punctuation_removed
 ),
 
 suffix_stripped as (
     select
-        id,
         url,
-        industry,
-        created_at,
+        title,
+        text,
+        timestamp,
+        digest,
+        company_name,
         trim(
             regexp_replace(
                 name_normalized,
@@ -58,10 +75,12 @@ suffix_stripped as (
 )
 
 select
-    id,
     url,
-    industry,
-    created_at,
+    title,
+    text,
+    timestamp,
+    digest,
+    company_name,
     normalized_name
 from suffix_stripped
-where normalized_name is not null and length(normalized_name) > 1;
+where normalized_name is not null and length(normalized_name) > 1

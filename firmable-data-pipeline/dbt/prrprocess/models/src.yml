@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: firmable_sources
     description: "Extracted source data from ABR and Common Crawl"
-    database: "{{ env_var('DBT_DB', 'postgres') }}"
+    database: "{{ env_var('DBT_DB', 'firmable') }}"
     schema: "{{ env_var('DBT_SCHEMA', 'public') }}"
 
     tables:
