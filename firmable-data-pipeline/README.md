@@ -219,6 +219,7 @@ GRANT SELECT ON TABLES TO readonly_user;
 ---
 
 ## 🧠 AI Model Used & Rationale
+
 No, an AI model was not used directly in this project due to the lack of computational resources and financial constraints. While advanced AI models could enhance entity matching through semantic understanding, their use often requires high-performance hardware or paid subscriptions, which were not feasible in this context.
 ---
 
@@ -265,6 +266,14 @@ docker-compose up --build
 - **Visual Studio Code (VSCode)**
   - Python extension
   - Docker + dbt integrations
+  - pg admin is exposed at 5050 use localhost:5050 
+  login: admin@firmable.com and pass:admin 
+      a. create server name 'db'
+      d. add connection 
+         host-postgres
+         user-admin
+         password-admin
+
 
 ---
 

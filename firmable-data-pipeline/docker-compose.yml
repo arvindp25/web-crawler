@@ -25,9 +25,6 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
-    # volumes:
-    #   - ./pgadmin:/var/lib/pgadmin
-    #   - ./pgadmin-servers.json:/pgadmin4/servers.json
     depends_on:
       - postgres
 
@@ -52,6 +49,6 @@ services:
     stdin_open: true
     tty: true
     command: >
-          python run.py --abr --abr-limit 2 --abr-records 20000 --crawl --crawl-pages 70 --dbt-run --entitiy-matching
+          python run.py --run-dbt --dbt-path ./dbt/prrprocess --entity-matching
 volumes:
   pgdata:
