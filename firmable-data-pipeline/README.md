@@ -171,22 +171,21 @@ GRANT SELECT ON TABLES TO readonly_user;
                 │                               │
                 ▼                               ▼
      ┌────────────────────┐           ┌──────────────────────┐
-     │  PostgreSQL (firmable)│         │ Tables: abr_record, │
-     │   via SQLAlchemy ORM  │         │        crawl_record │
+     │  PostgreSQL (firmable)│         │ Tables: abr_record,   │
+     │   via SQLAlchemy ORM  │         │        crawl_record   │
      └────────────────────┘           └──────────────────────┘
 
-                                   ▼
-                     ┌───────────────────────────┐
-                     │ DBT Transformations & Tests│
-                     │     (in /dbt/prrprocess)   │
-                     └────────────┬──────────────┘
-                                  │
-                                  ▼
-                     ┌────────────────────────────────┐
-                     │  Unified & Cleaned Models       │
-                     │  (dbt run + dbt test results)   │
-                     └────────────────────────────────┘
-
+                                ▼
+                   ┌───────────────────────────┐
+                   │ DBT Transformations & Tests│
+                   │     (in /dbt/prrprocess)   │
+                   └────────────┬──────────────┘
+                                │
+                                ▼
+                  ┌────────────────────────────────┐
+                  │  Unified & Cleaned Models       │
+                  │  (dbt run + dbt test results)   │
+                  └────────────────────────────────┘
 
 ```
 
