@@ -14,24 +14,7 @@ This project is a technical assessment for the role of **Data Engineer** at Firm
 | Quality Layer  | `dbt-core`   | Declarative modeling + testing |
 | Deployment     | CLI scripts  | Lightweight for this assessment |
 
----
 
-## 🧪 Setup Instructions
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/YOUR_USERNAME/firmable-data-pipeline.git
-cd firmable-data-pipeline
-
-
-# 📊 Firmable Data Pipeline
-
-## 🔍 Overview
-
-Design and implement a data pipeline to extract, transform, and load Australian company data from two sources—**Common Crawl** and the **Australian Business Register (ABR)**—into a **PostgreSQL** database. Perform **entity matching** to merge datasets and create a unified view of each company.
-
----
 
 ## 📚 Data Sources
 
@@ -212,7 +195,7 @@ GRANT SELECT ON TABLES TO readonly_user;
 | Orchestration   | Python + threading                  | Lightweight, simple for parallel ETL   |
 | Data Extraction | `warcio`, `bs4`, `requests`         | Efficient web archive and HTML parsing |
 | Data Loading    | SQLAlchemy ORM                      | Flexibility with PostgreSQL            |
-| Matching        | `fuzzy-wuzzy`                       | Light weight and less computational.   |
+| Matching        | `rapidfuzz  `                       | Light weight and less computational.   |
 | Transformation  | dbt                                 | Modular, tested SQL pipelines          |
 | Deployment      | Docker                              | Reproducible, portable environments    |
 
@@ -228,7 +211,7 @@ No, an AI model was not used directly in this project due to the lack of computa
 ### 1. Clone the Repo
 
 ```bash
-clone the repo
+clone the repo https://github.com/arvindp25/web-crawler.git
 cd firmable-data-pipeline
 ```
 
@@ -266,7 +249,7 @@ docker-compose up --build
 - **Visual Studio Code (VSCode)**
   - Python extension
   - Docker + dbt integrations
-  - pg admin is exposed at 5050 use localhost:5050 
+  - pg admin is exposed at 5050 use localhost:5050 to access ui
   login: admin@firmable.com and pass:admin 
       a. create server name 'db'
       d. add connection 
@@ -276,14 +259,3 @@ docker-compose up --build
 
 
 ---
-
-## 📬 Submission
-
-- Public GitHub Repo: [https://github.com/](https://github.com/<your-org>/firmable-data-pipeline)[/firmable-data-pipeline](https://github.com/<your-org>/firmable-data-pipeline)
-
----
-
-## 📃 License
-
-MIT License
-
