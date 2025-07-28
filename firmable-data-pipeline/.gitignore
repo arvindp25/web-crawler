@@ -7,3 +7,4 @@ data1/
 
 data/*
 !data/.gitkeep
+!data/cache/.gitkeep
