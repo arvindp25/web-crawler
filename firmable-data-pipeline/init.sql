@@ -52,12 +52,6 @@ CREATE INDEX IF NOT EXISTS idx_abr_entity_name_trgm
 CREATE INDEX IF NOT EXISTS idx_crawl_company_name_trgm
   ON crawl_records_extracted USING gin (company_name gin_trgm_ops);
 
--- 4. Optional: IVFFLAT indexes for ANN search (assumes table exists)
-CREATE INDEX IF NOT EXISTS idx_abr_embedding_ann
-  ON abr_embeddings USING ivfflat (entity_embedding vector_cosine_ops);
-
-CREATE INDEX IF NOT EXISTS idx_crawl_embedding_ann
-  ON crawl_embeddings USING ivfflat (company_embedding vector_cosine_ops);
 
 -- 5. Create read-only user and grant access
 

@@ -50,8 +50,7 @@ def run_common_crawl_pipeline(crawl_pages=100):
 
     # Group digests and metadata by WARC file
     warc_index = defaultdict(list)
-    for rec in records:
-        print(rec)
+    for rec in records: 
         warc_path = rec.get("filename")
         digest = rec.get("digest")
         offset = rec.get("offset")
