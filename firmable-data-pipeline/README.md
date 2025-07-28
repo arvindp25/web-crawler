@@ -202,7 +202,7 @@ GRANT SELECT ON TABLES TO readonly_user;
 ---
 
 ## 🧠 AI Model Used & Rationale
-
+---
 No, an AI model was not used directly in this project due to the lack of computational resources and financial constraints. While advanced AI models could enhance entity matching through semantic understanding, their use often requires high-performance hardware or paid subscriptions, which were not feasible in this context.
 ---
 
@@ -259,3 +259,110 @@ docker-compose up --build
 
 
 ---
+
+---
+Summary
+
+ Pipeline Execution Summary
+
+This project supports a modular pipeline architecture for extracting, transforming, and matching company data. You can execute the pipeline using the main entrypoint script run.py.
+The ABR pipeline handles downloading and parsing of Australian Business Register (ABR) XML data from the Australian government data portal.
+📥 Download & Extract
+
+    Downloads a ZIP archive from data.gov.au if not already cached.
+
+    Extracts XML files into the data/cache/abr_xmls/ directory.
+
+    Skips files that have already been downloaded or extracted.
+
+🧾 XML Parsing Logic
+
+    Parses each ABR XML document using a streaming iterator (ElementTree.iterparse) to handle large files efficiently.
+
+    Extracts entity metadata:
+
+        ABN
+
+        Entity Name (both individuals and organizations)
+
+        Entity Type & Status
+
+        Start Date
+
+        Business Location (State, Postcode)
+
+    Yields each record as a dictionary, ready for batch insertion into the database.
+
+
+
+🌐 Common Crawl Data Extraction
+
+This module extracts Australian company data from the Common Crawl March 2025 index by querying pages related to .au domains, parsing company names, and storing relevant metadata.
+Workflow
+
+    Query CDX Index
+
+        Pages matching *.au/* are fetched via the CDX API.
+
+        Filters: status:200, limit=1000, max 10 pages.
+
+    De-duplication
+
+        Each WARC digest and domain is tracked to avoid duplicate entries.
+
+    WARC Byte Range Fetching
+
+        Uses Range header to fetch only the required fragment from WARC files.
+
+        Efficient retrieval of HTML content without full WARC download.
+
+    HTML Parsing & Company Name Extraction
+
+        Extracts company name using:
+
+            <meta> tags (e.g., og:site_name, description)
+
+            <title> tag
+
+            <h1> tag
+
+            Footer copyright pattern (e.g., © 2024 XYZ Pty Ltd)
+
+            Named Entity Recognition (NER) using spaCy (label: ORG)
+
+    Record Storage
+
+        The final output includes:
+
+            Original URL
+
+            Cleaned company name
+
+            Page title
+
+            Raw text content
+
+            Digest and timestamp
+
+    Database Insert
+
+        Records are inserted into the crawl_records table using SQLAlchemy ORM.
+
+
+🔹 Parallel Execution
+
+    Both pipelines can be executed in parallel using threads.
+
+    Tables are auto-created using SQLAlchemy’s metadata before loading begins if not created earlier
+
+🔹 dbt Integration
+
+    Clean and transform data with dbt run targeting the abr_preprocess and crawl_preprocess models.
+
+    Optionally run data quality tests with dbt test.
+
+🔹 Entity Matching
+
+    Optionally perform entity resolution using RapidFuzz string similarity between company names from both datasets.
+
+    Matched pairs are written into the matched_entities table.
